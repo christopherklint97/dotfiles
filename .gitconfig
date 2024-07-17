@@ -1,0 +1,29 @@
+[alias]
+	co = commit
+	s = status
+	ch = checkout
+	d = diff
+	f = fetch --all
+	a = add
+	pull = pull --all
+	l = log
+[user]
+	name = Christopher Klint
+	email = christopher.klint@gmail.com
+[pull]
+	ff = only
+[rerere]
+	enabled = true
+[advice]
+	skippedCherryPicks = false
+[push]
+	autoSetupRemote = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[core]
+	editor = nvim
+[url "git@github.com:"]
+	insteadOf = https://github.com/
