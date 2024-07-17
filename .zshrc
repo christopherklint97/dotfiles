@@ -125,20 +125,6 @@ export NVM_DIR="$HOME/.nvm"
 # rbenv init
 eval "$(rbenv init - zsh)"
 
-# pnpm
-export PNPM_HOME="/Users/christopherklint/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-# goland
-export PATH=/Applications/GoLand.app/Contents/MacOS:$PATH
-
-# ctags
-ctags=/opt/homebrew/bin/ctags
-
 # Created by `pipx` on 2024-06-07 21:10:33
 export PATH="$PATH:/Users/christopherklint/.local/bin"
 
