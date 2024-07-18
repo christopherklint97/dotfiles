@@ -18,6 +18,10 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
 git submodule update --init --recursive
 
+# Install tmux plugin manager
+
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
 # Create symlinks and adopt the files that already exist
 
 stow --adopt .
