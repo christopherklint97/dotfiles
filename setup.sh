@@ -6,10 +6,18 @@ brew bundle --file=~/dotfiles/Brewfile
 
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# install nvm
+# Clone zsh-autosuggestions plugin
+
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+# Install nvm
 
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
-# Create symlinks
+# Git pull submodules (e.g. nvim)
 
-stow .
+git submodule update --init --recursive
+
+# Create symlinks and adopt the files that already exist
+
+stow --adopt .
