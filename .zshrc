@@ -81,11 +81,6 @@ source $ZSH/oh-my-zsh.sh
 # vi-mode
 VI_MODE_SET_CURSOR=true
 
-# android
-export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
-export PATH=$PATH:$ANDROID_SDK_ROOT/emulator
-export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools
-
 # make
 export PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
 
@@ -142,5 +137,20 @@ setopt globstarshort
 # imagemagick
 export DYLD_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_LIBRARY_PATH"
 
-# read openai api key from text file and export it
-export OPENAI_API_KEY=$(cat ~/openai_api_key.txt)
+# Android SDK
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/build-tools/35.0.0
+
+# Tizen SDK
+export TIZEN_HOME=$HOME/tizen-studio
+export PATH=$PATH:$TIZEN_HOME/tools
+export PATH=$PATH:$TIZEN_HOME/tools/ide/bin
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /opt/homebrew/bin/terragrunt terragrunt
