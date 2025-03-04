@@ -38,3 +38,24 @@ Here is a list of desktop applications that I use on a daily basis. These can be
 * WhatsApp.localized
 * balenaEtcher.app
 * iStat Menus.app
+
+## Aliases for zsh
+
+```zsh
+alias ls="ls -lahG"
+alias ga="git add ."
+alias gc="git commit -m"
+alias gp="git push"
+alias gpl="git pull"
+alias gco="git checkout"
+alias gcb="git checkout -b"
+alias gs="git status"
+alias gd="git diff"
+alias gl="git log"
+alias ghprc="gh pr create -a @me"
+alias ghprv="gh pr view -w"
+alias ghrv="gh repo view -w"
+alias ghprm="gh pr merge"
+```
+
+
