@@ -56,6 +56,6 @@ alias ghprc="gh pr create -a @me"
 alias ghprv="gh pr view -w"
 alias ghrv="gh repo view -w"
 alias ghprm="gh pr merge"
+alias pip="pip3"
+alias vim="nvim"
 ```
-
-
