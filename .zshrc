@@ -95,11 +95,11 @@ export PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='nvim'
 # fi
 
 # Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch $(uname -m)"
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
@@ -116,6 +116,8 @@ export PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
 # only run if on ubuntu
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+else 
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 # direnv
