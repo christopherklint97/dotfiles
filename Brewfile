@@ -59,7 +59,6 @@ brew "zsh"
 brew "daveshanley/vacuum/vacuum"
 
 cask "basictex"
-cask "docker"
 cask "flipper"
 cask "font-jetbrains-mono-nerd-font"
 cask "ngrok"
