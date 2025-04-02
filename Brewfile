@@ -1,6 +1,4 @@
 tap "daveshanley/vacuum"
-tap "homebrew/bundle"
-tap "homebrew/services"
 
 brew "ack"
 brew "act"
