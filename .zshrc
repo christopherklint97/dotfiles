@@ -79,12 +79,17 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 # vi-mode
-VI_MODE_SET_CURSOR=true
+VI_MODE_SET_CURSOR=false
 
 # make
 export PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
 
 # User configuration
+
+# Source local environment variables (if file exists)
+if [ -f ~/.env.local ]; then
+    source ~/.env.local
+fi
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -127,8 +132,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# rbenv init
-eval "$(rbenv init - zsh)"
+# homebrew
+export PATH=/usr/local/bin:$PATH
 
 # Created by `pipx` on 2024-06-07 21:10:33
 export PATH="$PATH:$HOME/.local/bin"
@@ -156,3 +161,21 @@ export SDKMAN_DIR="$HOME/.sdkman"
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terragrunt terragrunt
+
+# rbenv init
+eval "$(rbenv init - zsh)"
+
+# postgres
+export PGUSER=postgres
+
+# rust
+. "$HOME/.cargo/env"
+
+# go/bin
+export PATH=$HOME/go/bin:$PATH
+
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/telnesstech/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
