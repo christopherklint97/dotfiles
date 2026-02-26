@@ -65,6 +65,24 @@ install_homebrew() {
     eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /usr/local/bin/brew shellenv)"
   else
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+    # Persist Homebrew in PATH for future bash sessions (.zshrc handles zsh)
+    local brew_shellenv='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+    for rc_file in "$HOME/.bashrc" "$HOME/.profile"; do
+      if ! grep -q 'linuxbrew' "$rc_file" 2>/dev/null; then
+        echo >> "$rc_file"
+        echo "$brew_shellenv" >> "$rc_file"
+      fi
+    done
+
+    # Install Homebrew's recommended build dependencies
+    if command_exists apt-get; then
+      sudo apt-get install -y build-essential
+    elif command_exists dnf; then
+      sudo dnf groupinstall -y 'Development Tools'
+    elif command_exists yum; then
+      sudo yum groupinstall -y 'Development Tools'
+    fi
   fi
   success "Homebrew installed"
 }
@@ -91,6 +109,8 @@ install_packages() {
 
   if [[ "$OS" == "Darwin" ]]; then
     packages+=(gnu-sed reattach-to-user-namespace)
+  else
+    packages+=(gcc)
   fi
 
   brew install "${packages[@]}"
