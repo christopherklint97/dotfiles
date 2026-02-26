@@ -40,6 +40,13 @@ ensure_git_https() {
   # The Homebrew installer (and other tools) clone from GitHub via git.
   # If the user's git config rewrites HTTPS URLs to SSH (url.git@github.com:.insteadOf),
   # clones will fail on machines without SSH keys.  Force HTTPS to avoid this.
+
+  # Remove broken symlink left over from a previous install (e.g., stow linked
+  # ~/.gitconfig → ~/dotfiles/.gitconfig, but the repo was later removed).
+  if [[ -L "$HOME/.gitconfig" && ! -e "$HOME/.gitconfig" ]]; then
+    rm "$HOME/.gitconfig"
+  fi
+
   git config --global url."https://github.com/".insteadOf "git@github.com:"
 }
 
