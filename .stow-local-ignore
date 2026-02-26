@@ -1,0 +1,7 @@
+\.git
+\.gitignore
+\.gitmodules
+README\.md
+setup\.sh
+LICENSE
+\.stow-local-ignore

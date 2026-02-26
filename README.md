@@ -1,61 +1,40 @@
-# Setup dotfiles on a new machine
+# dotfiles
 
-First step is to clone this repo using `gh`.
+One-command setup for macOS and Linux.
 
-```bash
-# install brew and gh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install gh
-gh repo clone christopherklint97/dotfiles
-```
-
-To setup dotfiles on a new machine, run the `setup.sh` script. This script will create symlinks to the dotfiles in the home directory.
+## Install
 
 ```bash
-chmod +x setup.sh
-./setup.sh
+curl -fsSL https://raw.githubusercontent.com/christopherklint97/dotfiles/main/setup.sh | bash
 ```
 
-## List of desktop applications
+Or clone and run manually:
 
-Here is a list of desktop applications that I use on a daily basis. These can be installed in addition to the dotfiles.
-
-* 1Password.app
-* Alfred 5.app
-* Brave Browser.app
-* ColorSlurp.app
-* Docker.app
-* Insomnia.app
-* Keymapp.app
-* Messenger.app
-* Obsidian.app
-* Rectangle.app
-* Slack.app
-* Spotify.app
-* SteerMouse.app
-* Visual Studio Code.app
-* WezTerm.app
-* WhatsApp.localized
-* balenaEtcher.app
-* iStat Menus.app
-
-## Aliases for zsh
-
-```zsh
-alias ls="ls -lahG"
-alias ga="git add ."
-alias gc="git commit -m"
-alias gp="git push"
-alias gpl="git pull"
-alias gco="git checkout"
-alias gcb="git checkout -b"
-alias gs="git status"
-alias gd="git diff"
-alias gl="git log"
-alias ghprc="gh pr create -a @me"
-alias ghprv="gh pr view -w"
-alias ghrv="gh repo view -w"
-alias ghprm="gh pr merge"
-alias pip="pip3"
-alias vim="nvim"
+```bash
+git clone https://github.com/christopherklint97/dotfiles.git ~/dotfiles
+cd ~/dotfiles && ./setup.sh
 ```
+
+## What's included
+
+| Config | Description |
+|--------|-------------|
+| `.zshrc` | oh-my-zsh with autosuggestions and vi-mode |
+| `.config/nvim/` | Neovim (kickstart.nvim base, git submodule) |
+| `.tmux.conf` | vi-mode, mouse, dracula theme, vim-tmux-navigator |
+| `.wezterm.lua` | Dracula theme, macOS-friendly keybindings |
+| `.gitconfig` | Aliases, fast-forward pulls, rerere, nvim editor |
+
+## Machine-specific config
+
+Create `~/.env.local` for environment variables that differ per machine (SDK paths, database users, work email overrides, etc.). It's sourced automatically by `.zshrc`.
+
+## How it works
+
+Symlinks are managed by [GNU Stow](https://www.gnu.org/software/stow/). The installer:
+
+1. Installs Homebrew (macOS and Linux)
+2. Installs core packages (neovim, tmux, fzf, ripgrep, etc.)
+3. Installs oh-my-zsh + plugins, nvm, tmux plugin manager
+4. Symlinks all dotfiles into `$HOME`
+5. Sets zsh as the default shell
