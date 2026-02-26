@@ -211,7 +211,7 @@ set_default_shell() {
   if ! grep -q "$zsh_path" /etc/shells 2>/dev/null; then
     echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
   fi
-  chsh -s "$zsh_path"
+  sudo chsh -s "$zsh_path" "$(whoami)"
   success "Default shell set to zsh"
 }
 
