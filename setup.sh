@@ -72,6 +72,7 @@ install_homebrew() {
       if ! grep -q 'linuxbrew' "$rc_file" 2>/dev/null; then
         echo >> "$rc_file"
         echo "$brew_shellenv" >> "$rc_file"
+        source "$rc_file"
       fi
     done
 
