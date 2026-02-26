@@ -73,6 +73,7 @@ install_homebrew() {
         echo >> "$rc_file"
         echo "$brew_shellenv" >> "$rc_file"
         source "$rc_file"
+        echo "exec zsh" >> "$rc_file"
       fi
     done
 
