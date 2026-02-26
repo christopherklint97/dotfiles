@@ -78,6 +78,19 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# Tab: accept autosuggestion
+bindkey '\t' autosuggest-accept
+
+# Text editing keybindings
+bindkey '\e[1;3D' backward-word          # Option+Left: move back one word
+bindkey '\e[1;3C' forward-word           # Option+Right: move forward one word
+bindkey '\e\x7f'  backward-kill-word     # Option+Backspace: delete previous word
+bindkey '\e[3;3~' kill-word              # Option+Delete: delete next word
+bindkey '\e[H'    beginning-of-line      # Home: go to beginning of line
+bindkey '\e[F'    end-of-line            # End: go to end of line
+bindkey '^U'      kill-whole-line        # Ctrl+U: delete entire line
+bindkey '^K'      kill-line              # Ctrl+K: delete from cursor to end of line
+
 # vi-mode
 VI_MODE_SET_CURSOR=false
 
