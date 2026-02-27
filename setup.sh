@@ -117,9 +117,10 @@ install_packages() {
 
   brew install "${packages[@]}"
 
-  # Font (macOS only - casks not available on Linux)
+  # Casks (macOS only)
   if [[ "$OS" == "Darwin" ]]; then
     brew install --cask font-jetbrains-mono-nerd-font 2>/dev/null || true
+    brew install --cask karabiner-elements 2>/dev/null || true
   fi
 
   success "Packages installed"

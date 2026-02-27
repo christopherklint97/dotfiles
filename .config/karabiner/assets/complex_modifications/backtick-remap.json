@@ -1,0 +1,39 @@
+{
+  "title": "Fix backtick on Unicode Hex Input layout",
+  "rules": [
+    {
+      "description": "Map § (grave_accent_and_tilde) to backtick via ABC input source",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "grave_accent_and_tilde",
+            "modifiers": {
+              "mandatory": ["shift"],
+              "optional": ["caps_lock"]
+            }
+          },
+          "to": [
+            { "select_input_source": { "input_source_id": "com.apple.keylayout.ABC" } },
+            { "key_code": "non_us_backslash", "modifiers": ["shift"] },
+            { "select_input_source": { "input_source_id": "com.apple.keylayout.UnicodeHexInput" } }
+          ]
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "grave_accent_and_tilde",
+            "modifiers": {
+              "optional": ["caps_lock"]
+            }
+          },
+          "to": [
+            { "select_input_source": { "input_source_id": "com.apple.keylayout.ABC" } },
+            { "key_code": "non_us_backslash" },
+            { "select_input_source": { "input_source_id": "com.apple.keylayout.UnicodeHexInput" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

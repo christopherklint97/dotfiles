@@ -24,6 +24,15 @@ cd ~/dotfiles && ./setup.sh
 | `.tmux.conf` | vi-mode, mouse, dracula theme, vim-tmux-navigator |
 | `.wezterm.lua` | Dracula theme, macOS-friendly keybindings |
 | `.gitconfig` | Aliases, fast-forward pulls, rerere, nvim editor |
+| `.config/karabiner/` | Remap § to backtick for Unicode Hex Input (macOS only) |
+
+## Post-install (macOS)
+
+Karabiner-Elements requires manual setup after install:
+
+1. Open Karabiner-Elements and grant the required accessibility permissions
+2. Add **ABC** as an input source in **System Settings > Keyboard > Input Sources > Edit**
+3. In Karabiner, go to **Complex Modifications > Add predefined rule** and enable **"Fix backtick on Unicode Hex Input layout"**
 
 ## Machine-specific config
 
