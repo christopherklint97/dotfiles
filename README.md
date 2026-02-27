@@ -28,11 +28,12 @@ cd ~/dotfiles && ./setup.sh
 
 ## Post-install (macOS)
 
-Karabiner-Elements requires manual setup after install:
+Karabiner-Elements remaps § to backtick for ISO keyboards using the Unicode Hex Input layout. It requires manual setup after install:
 
-1. Open Karabiner-Elements and grant the required accessibility permissions
-2. Add **ABC** as an input source in **System Settings > Keyboard > Input Sources > Edit**
-3. In Karabiner, go to **Complex Modifications > Add predefined rule** and enable **"Fix backtick on Unicode Hex Input layout"**
+1. Open **Karabiner-Elements** — it will prompt for permissions on first launch
+2. Grant **Input Monitoring** in **System Settings > Privacy & Security > Input Monitoring** (enable `karabiner_grabber` and `karabiner_observer`)
+3. Add **ABC** as an input source in **System Settings > Keyboard > Input Sources > Edit** (Karabiner switches to it briefly for each keypress — you don't need to use it)
+4. In Karabiner, go to **Complex Modifications > Add predefined rule** and enable **"Fix backtick on Unicode Hex Input layout"**
 
 ## Machine-specific config
 
