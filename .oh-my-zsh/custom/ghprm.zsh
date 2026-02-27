@@ -138,23 +138,36 @@ function ghprm() {
     return 1
   fi
 
-  # --- After-merge housekeeping: ensure we're on base (if local branch was deleted) ---
-  local on_branch
-  on_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  if [[ "$on_branch" == "$head_ref" ]]; then
-    # Try switch to base branch
-    if git show-ref --verify --quiet "refs/heads/$base_ref"; then
-      git checkout "$base_ref" >/dev/null 2>&1 || true
-    else
-      # Create local tracking base if missing
-      git fetch "$remote" "$base_ref" >/dev/null 2>&1 || true
-      git checkout -t "$remote/$base_ref" >/dev/null 2>&1 || true
-    fi
-  fi
-
+  # --- After-merge housekeeping ---
   echo "🧹 Branch '$head_ref' deleted (local & remote)."
 
-  git pull
+  # Detect worktree by cwd and map to parked branch
+  local cwd="$(pwd)"
+  local parked_branch=""
+  if [[ "$cwd" == *telness3* ]]; then
+    parked_branch="parked3"
+  elif [[ "$cwd" == *telness2* ]]; then
+    parked_branch="parked2"
+  elif [[ "$cwd" == *telness* ]]; then
+    parked_branch="parked"
+  fi
+
+  if [[ -n "$parked_branch" ]]; then
+    echo "🔄 Worktree detected — checking out $parked_branch and rebasing master..."
+    git checkout "$parked_branch" && git rebase master
+  else
+    local on_branch
+    on_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    if [[ "$on_branch" == "$head_ref" ]]; then
+      if git show-ref --verify --quiet "refs/heads/$base_ref"; then
+        git checkout "$base_ref" >/dev/null 2>&1 || true
+      else
+        git fetch "$remote" "$base_ref" >/dev/null 2>&1 || true
+        git checkout -t "$remote/$base_ref" >/dev/null 2>&1 || true
+      fi
+    fi
+    git pull
+  fi
 
   echo "✨ Done."
 }
