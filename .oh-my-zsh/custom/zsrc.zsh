@@ -1,6 +1,6 @@
-# Reload zsh config across all running shells via USR1 signal
-TRAPUSR1() { source ~/.zshrc }
-
+# Reload zsh config across all tmux panes
 zsrc() {
-  killall -USR1 zsh
+  tmux list-panes -a -F '#{pane_id}' | while read -r pane; do
+    tmux send-keys -t "$pane" "source ~/.zshrc" Enter
+  done
 }
