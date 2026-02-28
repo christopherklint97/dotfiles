@@ -143,12 +143,13 @@ function ghprm() {
 
   # Detect worktree by cwd and map to parked branch
   local cwd="$(pwd)"
+  local dir_name="${cwd##*/}"
   local parked_branch=""
-  if [[ "$cwd" == *telness3* ]]; then
+  if [[ "$dir_name" == telness3 ]]; then
     parked_branch="parked3"
-  elif [[ "$cwd" == *telness2* ]]; then
+  elif [[ "$dir_name" == telness2 ]]; then
     parked_branch="parked2"
-  elif [[ "$cwd" == *telness* ]]; then
+  elif [[ "$dir_name" == telness ]]; then
     parked_branch="parked"
   fi
 
