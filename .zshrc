@@ -60,6 +60,11 @@ export PATH="$HOME/go/bin:$PATH"
 # pipx / local bins
 export PATH="$PATH:$HOME/.local/bin"
 
+# bun
+export BUN_INSTALL="$HOME/.bun"
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 # --- Local overrides (machine-specific config goes here) ---
 
 [ -f ~/.env.local ] && source ~/.env.local
