@@ -15,7 +15,16 @@ source $ZSH/oh-my-zsh.sh
 
 # --- Keybindings ---
 
-bindkey '\t' autosuggest-accept          # Tab: accept autosuggestion
+# Tab: accept autosuggestion if one exists, otherwise do normal completion
+_tab_autosuggest_or_complete() {
+  if [[ -n "$POSTDISPLAY" ]]; then
+    zle autosuggest-accept
+  else
+    zle expand-or-complete
+  fi
+}
+zle -N _tab_autosuggest_or_complete
+bindkey '\t' _tab_autosuggest_or_complete
 bindkey '\e[1;3D' backward-word          # Option+Left: back one word
 bindkey '\e[1;3C' forward-word           # Option+Right: forward one word
 bindkey '\e\x7f'  backward-kill-word     # Option+Backspace: delete previous word
