@@ -99,6 +99,7 @@ install_packages() {
     neovim
     fzf
     ripgrep
+    fd
     gh
     git-lfs
     direnv
