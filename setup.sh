@@ -66,17 +66,6 @@ install_homebrew() {
   else
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-    # Persist Homebrew in PATH for future bash sessions (.zshrc handles zsh)
-    local brew_shellenv='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
-    for rc_file in "$HOME/.bashrc" "$HOME/.profile"; do
-      if ! grep -q 'linuxbrew' "$rc_file" 2>/dev/null; then
-        echo >> "$rc_file"
-        echo "$brew_shellenv" >> "$rc_file"
-        source "$rc_file"
-        echo "exec zsh" >> "$rc_file"
-      fi
-    done
-
     # Install Homebrew's recommended build dependencies
     if command_exists apt-get; then
       sudo apt-get install -y build-essential
@@ -258,6 +247,15 @@ main() {
   install_tpm
   create_symlinks
   set_default_shell
+
+  # Persist Homebrew in PATH for future bash sessions (Linux only; .zshrc handles zsh)
+  if [[ "$OS" == "Linux" ]]; then
+    if ! grep -q 'linuxbrew' "$HOME/.bashrc" 2>/dev/null; then
+      echo >> "$HOME/.bashrc"
+      echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"' >> "$HOME/.bashrc"
+    fi
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+  fi
 
   echo ""
   success "Done! Restart your terminal or run: exec zsh"
