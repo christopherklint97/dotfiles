@@ -97,6 +97,7 @@ install_packages() {
     wget
     tree
     zsh
+    cpulimit
   )
 
   if [[ "$OS" == "Darwin" ]]; then

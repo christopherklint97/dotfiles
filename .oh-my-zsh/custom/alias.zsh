@@ -14,6 +14,7 @@ alias grsh="git reset --soft HEAD~1"
 # GitHub CLI aliases
 
 alias ghprv="gh pr view -w"
+alias ghprl="gh pr view --json url --jq '.url' | pbcopy && echo 'PR link copied to clipboard'"
 alias ghrv="gh repo view -w"
 
 ## Watch the latest convox.yml workflow run
@@ -31,3 +32,4 @@ alias pip="pip3"
 alias vim="nvim"
 alias ls="ls -lahG"
 alias grep="grep -i"
+alias capstatus="crontab -l && echo '' && echo 'Active cpulimit processes:' && ps aux | grep cpulimit | grep -v grep || echo 'None'"
