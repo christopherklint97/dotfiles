@@ -77,3 +77,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # --- Local overrides (machine-specific config goes here) ---
 
 [ -f ~/.env.local ] && source ~/.env.local
+
+# Go (system install)
+export PATH="/usr/local/go/bin:$PATH"
