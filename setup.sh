@@ -208,6 +208,11 @@ create_symlinks() {
   cd "$DOTFILES_DIR"
   stow --adopt .
   git checkout .
+
+  # Stow ignores CLAUDE.md globally, so manually symlink the global Claude config
+  mkdir -p "$HOME/.claude"
+  ln -sf "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
   success "Symlinks created"
 }
 
