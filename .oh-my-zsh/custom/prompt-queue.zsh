@@ -219,7 +219,7 @@ _pq_run_all() {
 # --- qe: Edit ---
 
 _pq_edit() {
-  ${EDITOR:-vim} "$_PQ_QUEUE"
+  ${EDITOR:-nvim} "$_PQ_QUEUE"
 }
 
 # --- ql: Log ---
