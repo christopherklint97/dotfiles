@@ -36,7 +36,9 @@ EOF
 # --- Helpers ---
 
 _pq_task_count() {
-  grep -c '^\## Task [0-9]' "$_PQ_QUEUE" 2>/dev/null || echo 0
+  local n
+  n=$(grep -c '^\## Task [0-9]' "$_PQ_QUEUE" 2>/dev/null) || true
+  echo "${n:-0}"
 }
 
 _pq_next_num() {
