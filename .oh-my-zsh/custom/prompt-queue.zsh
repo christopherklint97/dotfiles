@@ -268,6 +268,24 @@ EOF
   echo "Queue cleared."
 }
 
+# --- qh: Help ---
+
+_pq_help() {
+  cat <<'EOF'
+Prompt Queue — task queue for Claude Code
+
+  qq  "task" ["checkpoint"]  Add task (default checkpoint: no errors)
+  qs                         Show queue status
+  qr                         Run next pending task
+  qra                        Run all pending tasks
+  qe                         Edit queue.md in $EDITOR
+  ql  [N]                    View log (latest or task N)
+  qc                         Archive queue and start fresh
+  qi                         Init ~/.prompt-queue/
+  qh                         Show this help
+EOF
+}
+
 # --- Public aliases ---
 
 alias qq='_pq_add'
@@ -278,3 +296,4 @@ alias qe='_pq_edit'
 alias ql='_pq_log'
 alias qc='_pq_clear'
 alias qi='_pq_init'
+alias qh='_pq_help'
