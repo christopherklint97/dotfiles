@@ -90,10 +90,10 @@ _pq_status() {
   while IFS= read -r line; do
     if [[ "$line" =~ '## Task ([0-9]+) \[([a-z]+)\]' ]]; then
       local num="${match[1]}"
-      local status="${match[2]}"
+      local task_status="${match[2]}"
       # Extract description from next lines
       local emoji
-      case "$status" in
+      case "$task_status" in
         pending) emoji="[pending]"; ((pending++)) ;;
         done)    emoji="[done]";  ((done++)) ;;
         failed)  emoji="[failed]";  ((failed++)) ;;
