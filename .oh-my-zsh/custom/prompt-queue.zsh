@@ -1,7 +1,7 @@
 # prompt-queue.zsh — Task queue system for Claude Code
 #
 # Commands:
-#   qq  "task" ["checkpoint"]  Add a task to the queue
+#   qq  "task" ["checkpoint"] [--loop N]  Add a task to the queue
 #   qs                         Show queue status
 #   qr                         Run next pending task
 #   qra                        Run all pending tasks
@@ -47,24 +47,58 @@ _pq_next_num() {
 }
 
 _pq_next_pending() {
-  # Returns the task number of the first [pending] task
-  grep -m1 '^\## Task [0-9].* \[pending\]' "$_PQ_QUEUE" 2>/dev/null | sed 's/## Task \([0-9]*\).*/\1/'
+  # Returns the task number of the first [pending] or [looping X/N] task
+  grep -m1 '^\## Task [0-9].* \[\(pending\|looping\)' "$_PQ_QUEUE" 2>/dev/null | sed 's/## Task \([0-9]*\).*/\1/'
 }
 
 # --- qq: Add task ---
 
 _pq_add() {
-  local desc="$1"
-  local checkpoint="${2:-Code works correctly, no errors}"
+  local desc="" checkpoint="Code works correctly, no errors" loop=1
+  local args=("$@")
+  local positional=()
+
+  # Parse --loop N from arguments
+  local i=1
+  while (( i <= ${#args[@]} )); do
+    if [[ "${args[$i]}" == "--loop" ]]; then
+      ((i++))
+      if (( i <= ${#args[@]} )) && [[ "${args[$i]}" =~ ^[0-9]+$ ]]; then
+        loop="${args[$i]}"
+      else
+        echo "Error: --loop requires a numeric argument"
+        return 1
+      fi
+    else
+      positional+=("${args[$i]}")
+    fi
+    ((i++))
+  done
+
+  desc="${positional[1]:-}"
+  checkpoint="${positional[2]:-$checkpoint}"
 
   if [[ -z "$desc" ]]; then
-    echo "Usage: qq \"task description\" [\"checkpoint\"]"
+    echo "Usage: qq \"task description\" [\"checkpoint\"] [--loop N]"
     return 1
   fi
 
   local num=$(_pq_next_num)
 
-  cat >> "$_PQ_QUEUE" <<EOF
+  if (( loop > 1 )); then
+    cat >> "$_PQ_QUEUE" <<EOF
+
+## Task $num [pending]
+
+**Description:** $desc
+
+**Checkpoint:** $checkpoint
+
+**Loop:** $loop
+EOF
+    echo "Added task $num (loop x$loop): $desc"
+  else
+    cat >> "$_PQ_QUEUE" <<EOF
 
 ## Task $num [pending]
 
@@ -72,8 +106,8 @@ _pq_add() {
 
 **Checkpoint:** $checkpoint
 EOF
-
-  echo "Added task $num: $desc"
+    echo "Added task $num: $desc"
+  fi
 }
 
 # --- qs: Status ---
@@ -84,11 +118,11 @@ _pq_status() {
     return 1
   fi
 
-  local pending=0 done=0 failed=0
+  local pending=0 done=0 failed=0 looping=0
 
   echo "--- Queue ---"
   while IFS= read -r line; do
-    if [[ "$line" =~ '## Task ([0-9]+) \[([a-z]+)\]' ]]; then
+    if [[ "$line" =~ '## Task ([0-9]+) \[([a-z0-9/ ]+)\]' ]]; then
       local num="${match[1]}"
       local task_status="${match[2]}"
       # Extract description from next lines
@@ -97,7 +131,8 @@ _pq_status() {
         pending) emoji="[pending]"; ((pending++)) ;;
         done)    emoji="[done]";  ((done++)) ;;
         failed)  emoji="[failed]";  ((failed++)) ;;
-        *)       emoji="[$status]" ;;
+        looping*) emoji="[$task_status]"; ((looping++)) ;;
+        *)       emoji="[$task_status]" ;;
       esac
       # Read ahead to get description
       local desc=""
@@ -113,9 +148,11 @@ _pq_status() {
     fi
   done < "$_PQ_QUEUE"
 
-  local total=$((pending + done + failed))
+  local total=$((pending + done + failed + looping))
   echo ""
-  echo "$total total | $pending pending | $done done | $failed failed"
+  local status_line="$total total | $pending pending | $done done | $failed failed"
+  (( looping > 0 )) && status_line="$status_line | $looping looping"
+  echo "$status_line"
 }
 
 # --- qr: Run next task ---
@@ -128,21 +165,20 @@ _pq_run() {
     return 1
   fi
 
-  # Extract task description and checkpoint
-  local in_task=0 desc="" checkpoint="" task_block=""
+  # Extract task description, checkpoint, loop info, and current status
+  local in_task=0 desc="" checkpoint="" loop_total=1 current_iter=0 task_status=""
   while IFS= read -r line; do
-    if [[ "$line" =~ "## Task $num \[pending\]" ]]; then
+    if [[ "$line" =~ "## Task $num \[(pending|looping [0-9]+/[0-9]+)\]" ]]; then
       in_task=1
-      task_block="$line"
+      task_status="${match[1]}"
       continue
     fi
     if ((in_task)); then
       # Stop at next task header
       [[ "$line" =~ '^\## Task [0-9]' ]] && break
-      task_block="$task_block
-$line"
       [[ "$line" =~ '^\*\*Description:\*\* (.+)' ]] && desc="${match[1]}"
       [[ "$line" =~ '^\*\*Checkpoint:\*\* (.+)' ]] && checkpoint="${match[1]}"
+      [[ "$line" =~ '^\*\*Loop:\*\* ([0-9]+)' ]] && loop_total="${match[1]}"
     fi
   done < "$_PQ_QUEUE"
 
@@ -151,28 +187,82 @@ $line"
     return 1
   fi
 
+  # Determine current iteration
+  if [[ "$task_status" =~ "looping ([0-9]+)/([0-9]+)" ]]; then
+    current_iter="${match[1]}"
+    loop_total="${match[2]}"
+  else
+    current_iter=0
+  fi
+
+  local next_iter=$((current_iter + 1))
+  local is_looping=$(( loop_total > 1 ))
+  local is_final_iter=$(( next_iter >= loop_total ))
+
   local timestamp=$(date +%Y%m%d-%H%M%S)
   local logfile="$_PQ_LOGS/task-${num}-${timestamp}.log"
 
-  echo "Running task $num: $desc"
+  if (( is_looping )); then
+    echo "Running task $num (iteration $next_iter/$loop_total): $desc"
+  else
+    echo "Running task $num: $desc"
+  fi
   echo "Log: $logfile"
   echo ""
+
+  # Build the status transition instructions for the prompt
+  local status_instructions
+  if (( is_looping )); then
+    local old_status
+    if (( current_iter == 0 )); then
+      old_status="pending"
+    else
+      old_status="looping $current_iter/$loop_total"
+    fi
+
+    if (( is_final_iter )); then
+      status_instructions="4. After completing the task, update the queue file at $_PQ_QUEUE:
+   - If the checkpoint PASSES: change \"## Task $num [$old_status]\" to \"## Task $num [done]\"
+   - If the checkpoint FAILS and you cannot fix it: change to \"## Task $num [failed]\" and add a \"**Failure reason:**\" line below explaining why."
+    else
+      status_instructions="4. After completing the task, update the queue file at $_PQ_QUEUE:
+   - If the checkpoint PASSES: change \"## Task $num [$old_status]\" to \"## Task $num [looping $next_iter/$loop_total]\"
+   - If the checkpoint FAILS and you cannot fix it: change to \"## Task $num [failed]\" and add a \"**Failure reason:**\" line below explaining why."
+    fi
+  else
+    status_instructions="4. After completing the task, update the queue file at $_PQ_QUEUE:
+   - If the checkpoint PASSES: change \"## Task $num [pending]\" to \"## Task $num [done]\"
+   - If the checkpoint FAILS and you cannot fix it: change to \"## Task $num [failed]\" and add a \"**Failure reason:**\" line below explaining why."
+  fi
+
+  # Build iteration context for the prompt
+  local loop_context=""
+  if (( is_looping )); then
+    loop_context="
+LOOP ITERATION: $next_iter of $loop_total
+This task is being run multiple times to iteratively improve the solution.
+$(if (( next_iter == 1 )); then
+    echo "This is the FIRST iteration. Implement the initial solution."
+  elif (( is_final_iter )); then
+    echo "This is the FINAL iteration. Review everything done so far, polish and finalize the solution. Focus on edge cases, code quality, and completeness."
+  else
+    echo "This is iteration $next_iter. Review what was done in previous iterations and improve upon it. Look for bugs, edge cases, missed requirements, code quality improvements, and anything that can be made better."
+  fi)"
+  fi
 
   local prompt="You have a task to complete from a prompt queue.
 
 TASK #$num
 Description: $desc
 Checkpoint: $checkpoint
-
+$loop_context
 INSTRUCTIONS:
 1. First, read the relevant code and understand the codebase context before making changes.
 2. Implement the task described above thoroughly and carefully.
 3. Verify the checkpoint: $checkpoint
    - Run any tests, linters, or build commands needed to confirm the checkpoint passes.
    - If the checkpoint fails, debug and fix until it passes or determine it cannot be completed.
-4. After completing the task, update the queue file at $_PQ_QUEUE:
-   - If the checkpoint PASSES: change \"## Task $num [pending]\" to \"## Task $num [done]\"
-   - If the checkpoint FAILS and you cannot fix it: change to \"## Task $num [failed]\" and add a \"**Failure reason:**\" line below explaining why.
+$status_instructions
 5. Do NOT modify any other tasks in the queue file.
 
 Be thorough. Read before writing. Test your changes."
@@ -190,23 +280,30 @@ _pq_run_all() {
   echo "Running all pending tasks..."
   echo ""
 
+  local prev_num="" prev_status=""
   while true; do
     local num=$(_pq_next_pending)
     [[ -z "$num" ]] && break
 
-    _pq_run
-    local exit_code=$?
+    # Capture status before run
+    local before_line
+    before_line=$(grep "## Task $num \[" "$_PQ_QUEUE" 2>/dev/null | head -1)
 
-    # Check if the task we just ran is still pending or failed
+    _pq_run
+
+    # Check if the task failed
     if grep -q "## Task $num \[failed\]" "$_PQ_QUEUE" 2>/dev/null; then
       echo ""
       echo "Task $num failed. Stopping queue."
       return 1
     fi
 
-    if grep -q "## Task $num \[pending\]" "$_PQ_QUEUE" 2>/dev/null; then
+    # Check if the status didn't change at all (Claude didn't update it)
+    local after_line
+    after_line=$(grep "## Task $num \[" "$_PQ_QUEUE" 2>/dev/null | head -1)
+    if [[ "$before_line" == "$after_line" ]]; then
       echo ""
-      echo "Task $num still pending after run (Claude may not have updated status). Stopping."
+      echo "Task $num status unchanged after run (Claude may not have updated status). Stopping."
       return 1
     fi
 
@@ -276,15 +373,19 @@ _pq_help() {
   cat <<'EOF'
 Prompt Queue — task queue for Claude Code
 
-  qq  "task" ["checkpoint"]  Add task (default checkpoint: no errors)
-  qs                         Show queue status
-  qr                         Run next pending task
-  qra                        Run all pending tasks
-  qe                         Edit queue.md in $EDITOR
-  ql  [N]                    View log (latest or task N)
-  qc                         Archive queue and start fresh
-  qi                         Init ~/.prompt-queue/
-  qh                         Show this help
+  qq  "task" ["checkpoint"] [--loop N]  Add task (default checkpoint: no errors)
+  qs                                    Show queue status
+  qr                                    Run next pending task
+  qra                                   Run all pending tasks
+  qe                                    Edit queue.md in $EDITOR
+  ql  [N]                               View log (latest or task N)
+  qc                                    Archive queue and start fresh
+  qi                                    Init ~/.prompt-queue/
+  qh                                    Show this help
+
+Loop mode:
+  --loop N runs the same task N times, with each iteration improving
+  upon the previous one. Status cycles: pending → looping 1/N → ... → done
 EOF
 }
 
