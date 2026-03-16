@@ -154,8 +154,8 @@ function ghprm() {
   fi
 
   if [[ -n "$parked_branch" ]]; then
-    echo "🔄 Worktree detected — checking out $parked_branch and rebasing master..."
-    git checkout "$parked_branch" && git rebase master
+    echo "🔄 Worktree detected — updating master and rebasing $parked_branch..."
+    git checkout master && git pull && git checkout "$parked_branch" && git rebase master
   else
     local on_branch
     on_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"

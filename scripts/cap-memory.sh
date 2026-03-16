@@ -4,7 +4,7 @@
 # claude: only kills child/worker processes, not the main CLI session.
 
 MEM_LIMIT_KB=4000000 # ~4GB
-TARGETS=("gopls" "claude" "combine" "compile" "go")
+TARGETS=("gopls" "claude" "combine" "compile" "go" "node")
 
 for target in "${TARGETS[@]}"; do
   ps -eo pid,rss,command | grep -i "$target" | grep -v grep | while read -r pid rss _rest; do

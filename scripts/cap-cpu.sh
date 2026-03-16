@@ -3,7 +3,7 @@
 # Runs as a cron job every minute. Idempotent — skips already-managed PIDs.
 
 CPU_LIMIT=300 # percent (100 = 1 core, 300 = 3 cores)
-TARGETS=("gopls" "claude" "combine" "compile" "go")
+TARGETS=("gopls" "claude" "combine" "compile" "go" "node")
 
 for target in "${TARGETS[@]}"; do
   pgrep -f "$target" 2>/dev/null | while read -r pid; do
