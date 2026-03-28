@@ -13,6 +13,10 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# fzf (Ctrl+R: history search, Ctrl+T: file search, Alt+C: cd)
+# Sourced before keybindings so custom bindings take priority
+command -v fzf &>/dev/null && source <(fzf --zsh)
+
 # --- Keybindings ---
 
 # Tab: accept autosuggestion if one exists, otherwise do normal completion
