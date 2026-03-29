@@ -92,3 +92,6 @@ export PATH="$HOME/tizen-studio/tools/ide/bin:$HOME/tizen-studio/tools:$PATH"
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# bun completions
+[ -s "/home/christopherklint/.bun/_bun" ] && source "/home/christopherklint/.bun/_bun"
