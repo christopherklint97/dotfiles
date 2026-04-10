@@ -145,10 +145,8 @@ function ghprm() {
   local cwd="$(pwd)"
   local dir_name="${cwd##*/}"
   local parked_branch=""
-  if [[ "$dir_name" == telness3 ]]; then
-    parked_branch="parked3"
-  elif [[ "$dir_name" == telness2 ]]; then
-    parked_branch="parked2"
+  if [[ "$dir_name" =~ ^telness([0-9]+)$ ]]; then
+    parked_branch="parked${match[1]}"
   elif [[ "$dir_name" == telness ]]; then
     parked_branch="parked"
   fi

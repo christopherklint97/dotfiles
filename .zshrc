@@ -95,3 +95,6 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 # bun completions
 [ -s "/home/christopherklint/.bun/_bun" ] && source "/home/christopherklint/.bun/_bun"
+
+# mise completions
+eval "$(mise completion zsh)"
