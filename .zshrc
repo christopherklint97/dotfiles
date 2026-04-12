@@ -98,3 +98,6 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 # mise completions
 eval "$(mise completion zsh)"
+
+# kilo
+export PATH=/home/christopherklint/.kilo/bin:$PATH
