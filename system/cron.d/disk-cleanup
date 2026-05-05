@@ -1,0 +1,12 @@
+# Disk cleanup — installed by scripts/install-system-config.sh
+SHELL=/bin/bash
+PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin
+
+# Daily 03:00 — Docker hygiene (containers, images, builder, buildkit volume)
+0 3 * * * root /home/christopherklint/dotfiles/scripts/disk-cleanup.sh daily-docker >/dev/null 2>&1
+
+# Weekly Sun 03:30 — apt autoremove/clean + journal trim
+30 3 * * 0 root /home/christopherklint/dotfiles/scripts/disk-cleanup.sh weekly-system >/dev/null 2>&1
+
+# Weekly Sun 04:00 — user-level dev caches (pnpm/npm/uv/brew)
+0 4 * * 0 christopherklint /home/christopherklint/dotfiles/scripts/disk-cleanup.sh weekly-user >/dev/null 2>&1
