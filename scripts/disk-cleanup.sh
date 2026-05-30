@@ -14,7 +14,7 @@ cmd_daily_docker() {
   # The buildx builder keeps its cache in a separate volume that
   # `docker builder prune` does not reach. Prune from inside the container.
   if docker ps -q -f "name=^${BUILDKIT_CONTAINER}$" | grep -q .; then
-    docker exec "$BUILDKIT_CONTAINER" buildctl prune --keep-storage 2147483648
+    docker exec "$BUILDKIT_CONTAINER" buildctl prune --all --keep-storage 2048
   fi
 }
 
