@@ -26,6 +26,9 @@ alias ghdeploy="gh run list --workflow=deploy.yml --limit 1 --json databaseId --
 # Claude
 alias claude="claude --dangerously-skip-permissions"
 
+# Hermes
+alias hermes="hermes --skills caveman"
+
 # Other
 
 alias pip="pip3"
