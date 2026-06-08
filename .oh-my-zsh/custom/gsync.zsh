@@ -3,8 +3,29 @@
 # current branch on top of it.
 #
 # Usage:
-#   gsync
+#   gsync           # rebase current branch onto the default branch (default)
+#   gsync --merge   # merge the default branch into the current branch instead
 function gsync() {
+  local use_merge=0
+  while [[ "$1" == -* ]]; do
+    case "$1" in
+      -m|--merge)
+        use_merge=1
+        ;;
+      -h|--help)
+        echo "Usage: gsync [--merge]"
+        echo "  --merge, -m   Merge the default branch into the current branch instead of rebasing."
+        return 0
+        ;;
+      *)
+        echo "❌ Unknown option: $1"
+        echo "Usage: gsync [--merge]"
+        return 1
+        ;;
+    esac
+    shift
+  done
+
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "❌ Not a git repo."
     return 1
@@ -83,10 +104,18 @@ function gsync() {
     return 1
   fi
 
-  echo "🧬 Rebasing $current_branch onto $default_branch..."
-  if ! git rebase "$default_branch"; then
-    echo "❌ Rebase hit conflicts. Resolve them, then run 'git rebase --continue'."
-    return 1
+  if [[ "$use_merge" -eq 1 ]]; then
+    echo "🔀 Merging $default_branch into $current_branch..."
+    if ! git merge "$default_branch"; then
+      echo "❌ Merge hit conflicts. Resolve them, then run 'git commit'."
+      return 1
+    fi
+  else
+    echo "🧬 Rebasing $current_branch onto $default_branch..."
+    if ! git rebase "$default_branch"; then
+      echo "❌ Rebase hit conflicts. Resolve them, then run 'git rebase --continue'."
+      return 1
+    fi
   fi
 
   echo "✨ Done."
