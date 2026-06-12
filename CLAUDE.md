@@ -11,12 +11,14 @@ Repository: `https://github.com/christopherklint97/dotfiles`
 ```
 dotfiles/
 ├── .config/nvim/             # Neovim config (git submodule → kickstart.nvim fork)
+├── .config/k9s/              # k9s config + skins (auto light/dark via k9s.zsh)
 ├── .oh-my-zsh/custom/        # Custom zsh functions and aliases
 │   ├── alias.zsh             # Shell and git aliases
 │   ├── ghprc.zsh             # GitHub PR creation function
 │   ├── ghprm.zsh             # GitHub PR merge function
 │   ├── ghprchecks.zsh        # GitHub PR checks watcher
 │   ├── ghprcomments.zsh      # GitHub PR comment extraction (GraphQL)
+│   ├── k9s.zsh               # K9S_CONFIG_DIR + light/dark skin sync
 │   └── kubeconf.zsh          # Kubernetes config helper (Convox)
 ├── .gitconfig                # Git aliases, user config, LFS, pull strategy
 ├── .tmux.conf                # Tmux: vi-mode, mouse, dracula theme, TPM plugins
@@ -88,6 +90,7 @@ These are the custom shell functions in `.oh-my-zsh/custom/`:
 | `ghprchecks [--json]` | Watch PR checks or output JSON. |
 | `ghprcomments [--jq FILTER] [--copy] [--json [PATH]]` | Fetch PR comments/reviews via GraphQL, filter bots, optional clipboard copy. |
 | `kubeconf RACK` | Generate and merge Kubernetes config from a Convox rack. |
+| `k9s-theme-sync` | Regenerate the k9s `auto` skin from macOS appearance (Dracula dark / Catppuccin Latte light). The `k9s` wrapper runs it on every launch; k9s live-reloads the skin, so running it re-themes a running instance. |
 
 ## Common Aliases (from `alias.zsh`)
 
