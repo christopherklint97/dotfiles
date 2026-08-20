@@ -209,9 +209,14 @@ create_symlinks() {
   stow --adopt .
   git checkout .
 
-  # Stow ignores CLAUDE.md globally, so manually symlink the global Claude config
+  # Stow links .claude as a directory when present. Avoid linking a file to
+  # itself on Linux after that directory symlink has been created.
   mkdir -p "$HOME/.claude"
-  ln -sf "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+  if [[ "$HOME/.claude/CLAUDE.md" -ef "$DOTFILES_DIR/.claude/CLAUDE.md" ]]; then
+    success "Global Claude config already linked"
+  else
+    ln -sf "$DOTFILES_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+  fi
 
   success "Symlinks created"
 }
