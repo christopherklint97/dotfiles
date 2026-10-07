@@ -1,0 +1,16 @@
+[Unit]
+Description=Record host resource usage and power/thermal flags
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mainframe-health
+RuntimeDirectory=mainframe-health
+RuntimeDirectoryPreserve=yes
+CPUQuota=20%
+MemoryMax=64M
+TasksMax=16
+TimeoutStartSec=20
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes

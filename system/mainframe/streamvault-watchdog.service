@@ -1,0 +1,17 @@
+[Unit]
+Description=Recover StreamVault after repeated HTTP health failures
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/streamvault-watchdog
+RuntimeDirectory=streamvault-watchdog
+RuntimeDirectoryPreserve=yes
+TimeoutStartSec=75
+CPUQuota=20%
+MemoryMax=96M
+TasksMax=32
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes

@@ -1,0 +1,10 @@
+[Unit]
+Description=Check StreamVault once a minute
+
+[Timer]
+OnBootSec=6min
+OnUnitInactiveSec=60s
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target
