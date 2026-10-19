@@ -8,8 +8,8 @@ import shlex
 import sys
 
 LIMITS = [
-    "MemoryMax=2G",
-    "MemorySwapMax=256M",
+    "MemoryMax=3G",
+    "MemorySwapMax=512M",
     "CPUQuota=150%",
     "CPUWeight=30",
     "TasksMax=1024",
@@ -22,6 +22,11 @@ def main() -> None:
     except Exception:
         return
     if event.get("tool_name") != "Bash" or event.get("permission_mode") != "bypassPermissions":
+        return
+    # Worktree-isolated subagents: the harness must be able to verify their commands stay in
+    # the worktree, which a wrapped command defeats. They remain bounded by the aggregate
+    # hapi-runner / user-slice caps and earlyoom.
+    if "/.claude/worktrees/" in str(event.get("cwd") or ""):
         return
     tool_input = dict(event.get("tool_input") or {})
     command = tool_input.get("command")
