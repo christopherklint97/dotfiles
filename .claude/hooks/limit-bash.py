@@ -12,7 +12,7 @@ import sys
 PLAIN_CD = re.compile(r"^\s*cd(\s+[^;&|<>`$()]*)?\s*$")
 
 LIMITS = [
-    "MemoryMax=3G",
+    "MemoryMax=2400M",
     "MemorySwapMax=512M",
     "CPUQuota=150%",
     "CPUWeight=30",

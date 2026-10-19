@@ -6,8 +6,8 @@ plus higher CPU weight.
 
 | Layer | Scope | Limits | Installed at |
 |---|---|---|---|
-| Per command | every Bash command a bypass-mode Claude session runs (incl. subagents) gets its own `run-*.scope` via the `PreToolUse` hook `~/.claude/hooks/limit-bash.py` | 3 GB RAM, 512 MB swap, 1.5 CPU, 1024 tasks, nice 5 (not applied inside agent worktrees, which the harness must verify; those stay under the aggregate caps) | `~/.claude/settings.json` |
-| All Claude sessions | `hapi-runner.service` (user) | 3.6 GB RAM hard, 512 MB swap, 2 CPU, weight 30 | `~/.config/systemd/user/hapi-runner.service.d/60-resource-limits.conf` (`hapi-runner-resource-limits.conf`) |
+| Per command | every Bash command a bypass-mode Claude session runs (incl. subagents) gets its own `run-*.scope` via the `PreToolUse` hook `~/.claude/hooks/limit-bash.py` | 2.4 GB RAM, 512 MB swap, 1.5 CPU, 1024 tasks, nice 5 (not applied inside agent worktrees, which the harness must verify; those stay under the aggregate caps) | `~/.claude/settings.json` |
+| All Claude sessions | `hapi-runner.service` (user) | 2.8 GB RAM hard (below the ~3.3 GB actually free with services running, so the cap fires before Pi-wide swapping), 512 MB swap, 2 CPU, weight 30 | `~/.config/systemd/user/hapi-runner.service.d/60-resource-limits.conf` (`hapi-runner-resource-limits.conf`) |
 | Whole user | `user-1000.slice` | 4.2 GB RAM hard, 768 MB swap, 2 CPU, weight 40 | `/etc/systemd/system/user-1000.slice.d/60-mainframe-resource-limits.conf` (`user-resource-limits.conf`) |
 | Docker work started by AI | `claude.slice/claude-heavy.slice`; default buildx builder `claude-limited` (container capped 1.8 GB / 1.5 CPU); familjen-ab Playwright container (`--cgroup-parent=claude-heavy.slice --memory=1800m --cpus=1.5`) | 1.9 GB RAM hard, 256 MB swap, 1.5 CPU, weight 20 | `/etc/systemd/system/claude-heavy.slice` |
 | System-wide net | `earlyoom` | SIGTERM at <6% avail RAM & <15% swap free; prefers bun/node/vite/tsc/chromium/buildkit; never sshd, docker, Home Assistant, AdGuard, Tailscale, cloudflared, HAPI, Claude | `/etc/default/earlyoom` (`earlyoom.default`) |
