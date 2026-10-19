@@ -1,0 +1,11 @@
+[Unit]
+Description=Capped slice for AI-driven heavy work (Docker builds, browser test containers)
+
+[Slice]
+CPUQuota=150%
+CPUWeight=20
+IOWeight=20
+MemoryHigh=infinity
+MemoryMax=1900M
+MemorySwapMax=256M
+TasksMax=2048

@@ -1,0 +1,3 @@
+# Kill before the Pi locks up: act when available RAM < 6% AND free swap < 15%
+# (SIGKILL at 3% / 8%). Build/test/browser processes go first; core services never.
+EARLYOOM_ARGS="-m 6,3 -s 15,8 -r 3600 -p --prefer '(^|/)(bun|node|vite|esbuild|rolldown|tsc|tsgo|biome|chrome|chromium|chrome-headless-shell|headless_shell|playwright.*|buildkitd|buildkit-runc|runc|npm|npx|bunx)$' --avoid '(^|/)(init|systemd.*|sshd|dockerd|containerd.*|tailscaled|cloudflared|AdGuardHome|python3|hass|hapi|claude|caveman-proxy|Xorg|lightdm)$'"
