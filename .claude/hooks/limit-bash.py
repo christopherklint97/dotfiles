@@ -13,12 +13,24 @@ PLAIN_CD = re.compile(r"^\s*cd(\s+[^;&|<>`$()]*)?\s*$")
 
 LIMITS = [
     "MemoryMax=2400M",
-    "MemorySwapMax=512M",
+    "MemorySwapMax=256M",
     "CPUQuota=150%",
     "CPUWeight=30",
     "TasksMax=1024",
 ]
 MARK = "systemd-run --user --scope --quiet --collect"
+
+# Memory-hungry dev commands queue on one host-wide lock instead of running side by side
+# (parallel tsc/test/build runs from several agents pushed the Pi into swap and OOM-kills).
+HEAVY = re.compile(
+    r"(?:^|[;&|(\n])\s*(?:\w+=\S*\s+)*"  # command position, optional VAR=value prefixes
+    r"(?:(?:time|nice(?:\s+-n\s*-?\d+)?|npx|bunx|bun\s+x|pnpm\s+exec"
+    r"|flock(?:\s+-\S+(?:\s+\d+)?)*\s+\S+)\s+(?:--bun\s+)?)*"
+    r"(?:tsc|vitest|playwright|next\s+build|cargo\s+(?:build|test)|vite\s+build"
+    r"|docker\s+(?:buildx\s+)?build|bun\s+test"
+    r"|(?:bun|npm|pnpm|yarn)\s+(?:run\s+)?(?:build|ci|typecheck|test|check))(?:\s|$|[;&|)])"
+)
+HEAVY_LOCK = "flock -w 1800 /tmp/pi-heavy.lock"
 
 def main() -> None:
     try:
@@ -39,8 +51,9 @@ def main() -> None:
     if PLAIN_CD.match(command):
         return
     props = " ".join(f"-p {p}" for p in LIMITS)
+    lock = f"{HEAVY_LOCK} " if HEAVY.search(command) and "pi-heavy.lock" not in command else ""
     tool_input["command"] = (
-        f"{MARK} {props} -- nice -n 5 \"${{SHELL:-/bin/sh}}\" -c {shlex.quote(command)}"
+        f"{MARK} {props} -- {lock}nice -n 5 \"${{SHELL:-/bin/sh}}\" -c {shlex.quote(command)}"
     )
     json.dump(
         {

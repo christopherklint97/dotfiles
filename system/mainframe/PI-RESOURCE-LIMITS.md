@@ -6,7 +6,7 @@ plus higher CPU weight.
 
 | Layer | Scope | Limits | Installed at |
 |---|---|---|---|
-| Per command | every Bash command a bypass-mode Claude session runs (incl. subagents) gets its own `run-*.scope` via the `PreToolUse` hook `~/.claude/hooks/limit-bash.py` | 2.4 GB RAM, 512 MB swap, 1.5 CPU, 1024 tasks, nice 5 (not applied inside agent worktrees, which the harness must verify; those stay under the aggregate caps) | `~/.claude/settings.json` |
+| Per command | every Bash command a bypass-mode Claude session runs (incl. subagents) gets its own `run-*.scope` via the `PreToolUse` hook `~/.claude/hooks/limit-bash.py` | 2.4 GB RAM, 256 MB swap, 1.5 CPU, 1024 tasks, nice 5; heavy dev commands (tsc, tests, builds, playwright, docker build) also wait on the host-wide `flock /tmp/pi-heavy.lock` so only one runs at a time (not applied inside agent worktrees, which the harness must verify; those stay under the aggregate caps) | `~/.claude/settings.json` |
 | All Claude sessions | `hapi-runner.service` (user) | 2.8 GB RAM hard (below the ~3.3 GB actually free with services running, so the cap fires before Pi-wide swapping), 512 MB swap, 2 CPU, weight 30 | `~/.config/systemd/user/hapi-runner.service.d/60-resource-limits.conf` (`hapi-runner-resource-limits.conf`) |
 | Whole user | `user-1000.slice` | 4.2 GB RAM hard, 768 MB swap, 2 CPU, weight 40 | `/etc/systemd/system/user-1000.slice.d/60-mainframe-resource-limits.conf` (`user-resource-limits.conf`) |
 | Docker work started by AI | `claude.slice/claude-heavy.slice`; default buildx builder `claude-limited` (container capped 1.8 GB / 1.5 CPU); familjen-ab Playwright container (`--cgroup-parent=claude-heavy.slice --memory=1800m --cpus=1.5`) | 1.9 GB RAM hard, 256 MB swap, 1.5 CPU, weight 20 | `/etc/systemd/system/claude-heavy.slice` |
@@ -29,3 +29,10 @@ Restore on a fresh install:
     docker buildx create --name claude-limited --driver docker-container \
       --driver-opt memory=1800m --driver-opt cpu-quota=150000 --driver-opt cpu-period=100000 --bootstrap
     docker buildx use --default claude-limited
+
+2026-11-08 (Pi hanging during heavy multi-agent development): parallel `tsc` runs from several
+agents hit the user-slice cap (OOM-kills) and pushed ~1.5 GB into zram, whose compression ate CPU.
+Changes: heavy commands serialized via the hook lock; per-command swap 512 → 256 MB; images and
+tests build in GitHub CI only (see global CLAUDE.md), so the local buildx builders are stopped
+and 33 GB build cache, 275 dangling images and old rollback tags (keep newest 3 per app) pruned.
+dockerd had grown to ~1.7 GB RSS (422 images); it only shrinks on a docker restart.
