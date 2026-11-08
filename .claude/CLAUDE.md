@@ -11,6 +11,7 @@
 - The Pi only pulls and runs images. Deploy via the repo's `scripts/deploy.sh --wait`: pull the sha image, snapshot the DB if migrations are pending, create a rollback tag, `compose up`, wait for health; `--rollback <tag>` undoes. Locally run only focused tests or typecheck while iterating.
 - Reference repos: StreamVault, Familjen AB, Betplan. New repos copy their `ci.yml` + `deploy.sh` pattern; any repo that fully follows it becomes a reference too. When touching a repo that doesn't follow it, propose migrating.
 - Keep CI minutes lean (GitHub Free = $12/month for private repos; the budget blocks at the limit): one visual job rather than many shards, `needs:` so expensive jobs skip when cheap ones fail, cancel superseded PR runs, no duplicate push + pull_request runs, skip docs-only changes, no re-running PR-verified suites on main, arm64-only images. Check usage with `gh api "/users/christopherklint97/settings/billing/usage?year=YYYY&month=M"` before adding CI jobs.
+- Visual regression suites run on demand (`visual` PR label), automatically only for global UI changes (shell, ui kit, global styles/theme, deps), and weekly on main. Add the `visual` label to every PR that changes how the UI looks.
 - Secrets:
   - Never commit secrets. Runtime env files (`.env`, `.env.production`) are gitignored before the first commit and are mode 600.
   - Copy a key between repos without displaying it: `umask 077; grep '^NAME=' <src-env> >> <dst-env>`; verify with `test -s` / `stat`, never `cat`.
