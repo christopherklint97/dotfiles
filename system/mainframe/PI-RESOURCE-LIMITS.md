@@ -18,12 +18,25 @@ seconds instead of slowly throttling every session.
 Verified 2026-10-19: a 6 GB allocation from a fresh Claude session was OOM-killed in its scope at
 ~1.9 GB in ~11 s (load 1.6, production health 200 in 7 ms); 4 busy loops were held to 1.5 CPU.
 
+Nightly housekeeping: `mainframe-maintenance.timer` (04:40) runs `mainframe-maintenance.sh`:
+removes unused images beyond the newest 3 per repository once older than 7 days (images in
+use and rollback targets stay), prunes build caches older than 3 days and stops idle buildkit
+builders, kills dev processes (tsc, test runners, headless browsers, dev servers) older than 6 h,
+restarts dockerd when it exceeds 900 MiB (Docker `live-restore` keeps every container running;
+verified 2026-11-08: 1393 → 98 MiB, all containers and services stayed up), vacuums the journal
+to 500 MB. Logs: `journalctl -u mainframe-maintenance`. `docker-daemon.json` also caps container
+logs at 3 × 10 MB.
+
 Restore on a fresh install:
 
     sudo cp claude-heavy.slice /etc/systemd/system/
     sudo cp user-resource-limits.conf /etc/systemd/system/user-1000.slice.d/60-mainframe-resource-limits.conf
     mkdir -p ~/.config/systemd/user/hapi-runner.service.d
     cp hapi-runner-resource-limits.conf ~/.config/systemd/user/hapi-runner.service.d/60-resource-limits.conf
+    sudo install -m 644 docker-daemon.json /etc/docker/daemon.json && sudo systemctl reload docker
+    sudo install -m 755 mainframe-maintenance.sh /usr/local/sbin/mainframe-maintenance
+    sudo install -m 644 mainframe-maintenance.service mainframe-maintenance.timer /etc/systemd/system/
+    sudo systemctl daemon-reload && sudo systemctl enable --now mainframe-maintenance.timer
     sudo apt-get install -y earlyoom && sudo cp earlyoom.default /etc/default/earlyoom
     sudo systemctl daemon-reload && systemctl --user daemon-reload && sudo systemctl restart earlyoom
     docker buildx create --name claude-limited --driver docker-container \

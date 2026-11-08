@@ -1,0 +1,12 @@
+[Unit]
+Description=Nightly Pi housekeeping (old images, build caches, orphaned dev processes, dockerd bloat)
+After=docker.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mainframe-maintenance
+Nice=10
+IOSchedulingClass=idle
+CPUQuota=50%
+TimeoutStartSec=30min
